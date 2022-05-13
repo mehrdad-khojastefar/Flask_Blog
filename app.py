@@ -22,6 +22,9 @@ db = connect(db=os.getenv("DB_NAME"),
 
 @app.route("/get_posts")
 def get_posts():
+    """
+    Fetches all posts from database
+    """
     try:
         posts = json.loads(Post.objects().exclude("id").to_json())
         return {"result": "success", "count": len(posts), "posts": posts}, 200
