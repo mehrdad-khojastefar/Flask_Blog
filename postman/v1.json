@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "b3acb742-1280-4ee6-bb0a-892702c26b41",
+		"name": "myFlask",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "get_posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/get_posts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"get_posts"
+							]
+						},
+						"description": "feth all posts from database"
+					},
+					"response": []
+				},
+				{
+					"name": "get_post/<postId>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/get_post/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"get_post",
+								"2"
+							]
+						},
+						"description": "Get details of a post\n\npass the postId in the url"
+					},
+					"response": []
+				},
+				{
+					"name": "get_posts/<userId>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/get_posts/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"get_posts",
+								"2"
+							]
+						},
+						"description": "Get all the posts for a user"
+					},
+					"response": []
+				},
+				{
+					"name": "delete_post/<postId>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/delete_post/101",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"delete_post",
+								"101"
+							]
+						},
+						"description": "deletes the post with the given postId"
+					},
+					"response": []
+				},
+				{
+					"name": "add_post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"postId\":101,\r\n    \"title\":\"hiii\",\r\n    \"body\":\"hell\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/add_post",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"add_post"
+							]
+						},
+						"description": "adds a post object in to the database"
+					},
+					"response": []
+				},
+				{
+					"name": "edit_post/<postId>",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"body\": \"deit\\nvel qui neque voluptates ut commodi qui incidunt\\nut animi commodi\",\r\n            \"postId\": 1,\r\n            \"title\": \"hiiii\",\r\n            \"userId\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/edit_post/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"edit_post",
+								"1"
+							]
+						},
+						"description": "edits a post with the given postid"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "localhost:5000",
+			"type": "string"
+		}
+	]
+}
