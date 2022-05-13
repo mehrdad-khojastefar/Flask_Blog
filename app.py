@@ -1,22 +1,32 @@
-import re
+from models import Post
 from mongoengine import connect
 from flask import Flask, request, jsonify, make_response
 import json
+import os
+from dotenv import load_dotenv
+
+# loading env vars
+load_dotenv()
 
 # importing models
-from models import Post
 
 app = Flask(__name__)
 
 # connect to mongodb
-db = connect(db="my_db", username="root", password="example",
-             host="185.165.119.233", port=27017)
+db = connect(db=os.getenv("DB_NAME"),
+             username=os.getenv("DB_USERNAME"),
+             password=os.getenv("DB_PASSWORD"),
+             host=os.getenv("DB_HOST"),
+             port=int(os.getenv("DB_PORT")))
 
 
 @app.route("/get_posts")
 def get_posts():
-    posts = json.loads(Post.objects().to_json())
-    return {"count": len(posts), "posts": posts}
+    try:
+        posts = json.loads(Post.objects().exclude("id").to_json())
+        return {"result": "success", "count": len(posts), "posts": posts}, 200
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
 
 
 @app.route("/get_post/<postId>")
@@ -26,7 +36,7 @@ def get_post(postId):
 
 @app.route("/get_posts/<userId>")
 def get_posts_by_user(userId):
-    posts = json.loads(Post.objects(userId=userId).to_json())
+    posts = json.loads(Post.objects(userId=userId).exclude("id").to_json())
     return {"count": len(posts), "posts": posts}
 
 
@@ -39,7 +49,7 @@ def edit_post(postId):
     prev_post.title = request.get_json().get("title")
     prev_post.body = request.get_json().get("body")
     prev_post.save()
-    return f'This post with postId = {postId} updated'
+    return {"result": "success", "message": f'This post with postId = {postId} updated'}
 
 
 # TODO: Create Delete Post Endpoint
@@ -47,7 +57,7 @@ def edit_post(postId):
 def delete_post(postId):
     get_post = Post.objects(postId=postId)
     get_post.delete()
-    return f'This post with postId = {postId} deleted'
+    return {"result": "success", "message": f'This post with postId = {postId} deleted'}
 
 
 # TODO: Create Add Post
