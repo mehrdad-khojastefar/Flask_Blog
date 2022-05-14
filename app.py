@@ -55,9 +55,9 @@ def get_posts_by_user(userId):
 def edit_post(postId):
     prev_post = Post.objects(postId=postId).first()
 
-    prev_post.userId = int(request.get_json().get("userId"))
-    prev_post.title = request.get_json().get("title")
-    prev_post.body = request.get_json().get("body")
+    prev_post.userId = int(request.get_json().get(os.getenv("USER_ID")))
+    prev_post.title = request.get_json().get(os.getenv("TITLE"))
+    prev_post.body = request.get_json().get(os.getenv("BODY"))
     try:
         prev_post.save()
         return {"result": "success", "message": f'This post with postId = {postId} updated'}, 200
@@ -80,10 +80,10 @@ def delete_post(postId):
 @app.route("/add_post", methods=["POST"])
 def add_post():
     newPost = Post()
-    newPost.userId = int(request.get_json().get("userId"))
-    newPost.postId = int(request.get_json().get("postId"))
-    newPost.title = request.get_json().get("title")
-    newPost.body = request.get_json().get("body")
+    newPost.userId = int(request.get_json().get(os.getenv("USER_ID")))
+    newPost.postId = int(request.get_json().get(os.getenv("POST_ID")))
+    newPost.title = request.get_json().get(os.getenv("TITLE"))
+    newPost.body = request.get_json().get(os.getenv("BODY"))
     try:
         newPost.save()
         return {"result": "success", "message": f'new post with postId = {newPost.postId} created'}, 201
