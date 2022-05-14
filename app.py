@@ -34,13 +34,20 @@ def get_posts():
 
 @app.route("/get_post/<postId>")
 def get_post(postId):
-    return json.loads(Post.objects(postId=postId).first().to_json())
+    try:
+        post = json.loads(Post.objects(postId=postId).first().to_json())
+        return {"result": "success", "post": post}, 200
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
 
 
 @app.route("/get_posts/<userId>")
 def get_posts_by_user(userId):
-    posts = json.loads(Post.objects(userId=userId).exclude("id").to_json())
-    return {"count": len(posts), "posts": posts}
+    try:
+        posts = json.loads(Post.objects(userId=userId).exclude("id").to_json())
+        return {"result": "error", "count": len(posts), "posts": posts}, 200
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
 
 
 # TODO: Create Edit Post Endpint
@@ -51,16 +58,22 @@ def edit_post(postId):
     prev_post.userId = int(request.get_json().get("userId"))
     prev_post.title = request.get_json().get("title")
     prev_post.body = request.get_json().get("body")
-    prev_post.save()
-    return {"result": "success", "message": f'This post with postId = {postId} updated'}
+    try:
+        prev_post.save()
+        return {"result": "success", "message": f'This post with postId = {postId} updated'}, 200
+    except Exception as e:
+        {"result": "error", "message": f"{e}"}, 500
 
 
 # TODO: Create Delete Post Endpoint
 @app.route('/delete_post/<postId>', methods=['DELETE'])
 def delete_post(postId):
     get_post = Post.objects(postId=postId)
-    get_post.delete()
-    return {"result": "success", "message": f'This post with postId = {postId} deleted'}
+    try:
+        get_post.delete()
+        return {"result": "success", "message": f'This post with postId = {postId} deleted'}, 200
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
 
 
 # TODO: Create Add Post
@@ -71,9 +84,12 @@ def add_post():
     newPost.postId = int(request.get_json().get("postId"))
     newPost.title = request.get_json().get("title")
     newPost.body = request.get_json().get("body")
-    newPost.save()
-    return f'new post with postId = {newPost.postId} created'
+    try:
+        newPost.save()
+        return {"result": "success", "message": f'new post with postId = {newPost.postId} created'}, 201
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=5000)
+    app.run(debug=True, host=os.getenv("HOST"), port=int(os.getenv("PORT")))
