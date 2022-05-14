@@ -23,7 +23,7 @@ db = connect(db=os.getenv("DB_NAME"),
 @app.route("/get_posts")
 def get_posts():
     """
-    Fetches all posts from database
+    Fetches all posts from database , return all posts.
     """
     try:
         posts = json.loads(Post.objects().exclude("id").to_json())
@@ -34,6 +34,9 @@ def get_posts():
 
 @app.route("/get_post/<postId>")
 def get_post(postId):
+    '''
+    Fetches post with the postId in the path , return this post.
+    '''
     try:
         post = json.loads(Post.objects(postId=postId).first().to_json())
         return {"result": "success", "post": post}, 200
@@ -43,6 +46,9 @@ def get_post(postId):
 
 @app.route("/get_posts/<userId>")
 def get_posts_by_user(userId):
+    '''
+    Fetches all post with the userId in the path , return all the same userId.
+    '''
     try:
         posts = json.loads(Post.objects(userId=userId).exclude("id").to_json())
         return {"result": "error", "count": len(posts), "posts": posts}, 200
@@ -53,6 +59,9 @@ def get_posts_by_user(userId):
 # TODO: Create Edit Post Endpint
 @app.route("/edit_post/<postId>", methods=["PUT"])
 def edit_post(postId):
+    '''
+    Fetches post with the postId in the path , return the updated post.
+    '''
     prev_post = Post.objects(postId=postId).first()
 
     prev_post.userId = int(request.get_json().get(os.getenv("USER_ID")))
@@ -69,6 +78,9 @@ def edit_post(postId):
 
 @app.route('/delete_post/<postId>', methods=['DELETE'])
 def delete_post(postId):
+    '''
+    Fetches post with the postId in the path , return the deleted postId.
+    '''
     get_post = Post.objects(postId=postId)
     try:
         get_post.delete()
@@ -81,6 +93,9 @@ def delete_post(postId):
 
 @app.route("/add_post", methods=["POST"])
 def add_post():
+    '''
+    Create new post with request body , add this post to the database.
+    '''
     newPost = Post()
     newPost.userId = int(request.get_json().get(os.getenv("USER_ID")))
     newPost.postId = int(request.get_json().get(os.getenv("POST_ID")))
