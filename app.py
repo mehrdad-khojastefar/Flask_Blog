@@ -73,9 +73,8 @@ def edit_post(postId):
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
+
 # TODO: Create Delete Post Endpoint
-
-
 @app.route('/delete_post/<postId>', methods=['DELETE'])
 def delete_post(postId):
     '''
@@ -88,9 +87,8 @@ def delete_post(postId):
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
+
 # TODO: Create Add Post
-
-
 @app.route("/add_post", methods=["POST"])
 def add_post():
     '''
