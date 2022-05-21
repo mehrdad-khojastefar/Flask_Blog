@@ -71,11 +71,7 @@ def edit_post(postId):
         prev_post.save()
         return {"result": "success", "message": f'This post with postId = {postId} updated'}, 200
     except Exception as e:
-<<<<<<< HEAD
-        {"result": "error", "message": f"{e}"}, 500
-=======
         return {"result": "error", "message": f"{e}"}, 500
->>>>>>> 24a72431f76361a1023469354bc0414ed4730b55
 
 
 # TODO: Create Delete Post Endpoint
@@ -108,7 +104,6 @@ def add_post():
         return {"result": "success", "message": f'new post with postId = {newPost.postId} created'}, 201
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
-<<<<<<< HEAD
 
 
 @app.errorhandler(404)
@@ -119,8 +114,6 @@ def resource_not_found(e):
 @app.errorhandler(500)
 def resource_not_found(e):
     return jsonify(code=500, error=str(e)), 500
-=======
->>>>>>> 24a72431f76361a1023469354bc0414ed4730b55
 
 
 if __name__ == "__main__":
