@@ -11,7 +11,7 @@ g2- install the requirements ( it is also a good idea to create e virtual env)
 cd Flask_Blog
 pip install -r ./requirements.txt
 ```
-3- import the postman collection ( latest changes can be found in latest.json )
+3- import the postman collection ( latest changes can be found in postman/latest.json )
 
 # Running the project
 1- now after completing the steps above you should now be able to run the project 
