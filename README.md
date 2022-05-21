@@ -6,7 +6,7 @@ A to be completed blog and cms project....
 ```
 git clone git@github.com:MohammadBana23/Flask_Blog.git
 ```
-2- install the requirements ( it is also a good idea to create e virtual env)
+g2- install the requirements ( it is also a good idea to create e virtual env)
 ```
 cd Flask_Blog
 pip install -r ./requirements.txt
