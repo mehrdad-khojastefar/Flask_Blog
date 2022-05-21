@@ -1,6 +1,6 @@
 from models import Post
 from mongoengine import connect
-from flask import Flask, request, jsonify, make_response
+from flask import Flask,  render_template, request, jsonify, make_response
 import json
 import os
 from dotenv import load_dotenv
@@ -104,6 +104,16 @@ def add_post():
         return {"result": "success", "message": f'new post with postId = {newPost.postId} created'}, 201
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
+
+
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(code=404, error=str(e)), 404
+
+
+@app.errorhandler(500)
+def resource_not_found(e):
+    return jsonify(code=500, error=str(e)), 500
 
 
 if __name__ == "__main__":
