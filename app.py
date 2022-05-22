@@ -69,8 +69,9 @@ def get_post():
     '''
     try:
         data = request.get_json()
-        post: Post = Post.objects(postId=data['postId']).exclude("id").first()
-        if post.get_userId() == data['userId']:
+        post: Post = Post.objects(
+            postId=data[os.getenv("POST_ID")]).exclude("id").first()
+        if post.get_userId() == data[os.getenv("USER_ID")]:
             return {"result": "success", "post": json.loads(post.to_json())}, 200
         return {"result": "error", "message": "This user doesn't have access to this post"}, 403
     except Exception as e:
@@ -97,9 +98,9 @@ def edit_post(postId):
     return the updated post if the post is intended for its real user.
     '''
     data = request.get_json()
-    post: Post = Post.objects(postId=data['postId']).first()
+    post: Post = Post.objects(postId=data[os.getenv("POST_ID")]).first()
     try:
-        if post.get_userId() == data['userId']:
+        if post.get_userId() == data[os.getenv("USER_ID")]:
             post.title = data.get(os.getenv("TITLE"))
             post.body = data.get(os.getenv("BODY"))
             post.save()
@@ -113,12 +114,16 @@ def edit_post(postId):
 @app.route('/delete_post/<postId>', methods=['DELETE'])
 def delete_post(postId):
     '''
-    Fetches post with the postId in the path , return the deleted postId.
+    Fetch a post from the user's posts with postId in the path ,
+    return the deleted post if the post is intended for its real user.
     '''
-    get_post = Post.objects(postId=postId)
+    data = request.get_json()
+    post: Post = Post.objects(postId=data[os.getenv("POST_ID")]).first()
     try:
-        get_post.delete()
-        return {"result": "success", "message": f'This post with postId = {postId} deleted'}, 200
+        if post.get_userId() == data[os.getenv("USER_ID")]:
+            post.delete()
+            return {"result": "success", "message": f'This post with postId = {postId} for user {post.get_userId()} deleted'}, 200
+        return {"result": "error", "message": "This user doesn't have access to this post"}, 403
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
