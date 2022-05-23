@@ -1,4 +1,4 @@
-from models import Post
+from models import Post, User
 from mongoengine import connect
 from flask import Flask,  render_template, request, jsonify, make_response
 import json
@@ -20,6 +20,36 @@ db = connect(db=os.getenv("DB_NAME"),
              port=int(os.getenv("DB_PORT")))
 
 
+@app.route("/add_user", methods=["POST"])
+def add_user():
+    '''
+    Create new user with request body , add this user to the database.
+    '''
+    newUser = User()
+    newUser.userId = int(request.get_json().get(os.getenv("USER_ID")))
+    newUser.username = str(request.get_json().get(os.getenv("USER_NAME")))
+    newUser.password = str(request.get_json().get(os.getenv("PASSWORD")))
+    newUser.isAdmin = bool(request.get_json().get(os.getenv("IS_ADMIN")))
+    newUser.userEmail = request.get_json().get(os.getenv("USER_EMAIL"))
+    try:
+        newUser.save()
+        return {"result": "success", "message": f'new user with userId = {newUser.userId} created'}, 201
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
+
+
+@app.route("/get_user/<userId>", methods=["GET"])
+def get_user(userId):
+    '''
+    Fetches user with the id of user in the path , return this user.
+    '''
+    try:
+        user = json.loads(User.objects(userId=userId).first().to_json())
+        return {"result": "success", "user": user}, 200
+    except Exception as e:
+        return {"result": "error", "message": f"{e}"}, 500
+
+
 @app.route("/get_posts")
 def get_posts():
     """
@@ -32,14 +62,18 @@ def get_posts():
         return {"result": "error", "message": f"{e}"}, 500
 
 
-@app.route("/get_post/<postId>")
-def get_post(postId):
+@app.route("/get_post", methods=['POST'])
+def get_post():
     '''
     Fetches post with the postId in the path , return this post.
     '''
     try:
-        post = json.loads(Post.objects(postId=postId).first().to_json())
-        return {"result": "success", "post": post}, 200
+        data = request.get_json()
+        post: Post = Post.objects(
+            postId=data[os.getenv("POST_ID")]).exclude("id").first()
+        if post.get_userId() == data[os.getenv("USER_ID")]:
+            return {"result": "success", "post": json.loads(post.to_json())}, 200
+        return {"result": "error", "message": "This user doesn't have access to this post"}, 403
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
@@ -57,19 +91,21 @@ def get_posts_by_user(userId):
 
 
 # TODO: Create Edit Post Endpint
-@app.route("/edit_post/<postId>", methods=["PUT"])
+@app.route("/edit_post/<postId>", methods=["PUT", "POST"])
 def edit_post(postId):
     '''
-    Fetches post with the postId in the path , return the updated post.
+    Fetch a post from the user's posts with postId in the path ,
+    return the updated post if the post is intended for its real user.
     '''
-    prev_post = Post.objects(postId=postId).first()
-
-    prev_post.userId = int(request.get_json().get(os.getenv("USER_ID")))
-    prev_post.title = request.get_json().get(os.getenv("TITLE"))
-    prev_post.body = request.get_json().get(os.getenv("BODY"))
+    data = request.get_json()
+    post: Post = Post.objects(postId=data[os.getenv("POST_ID")]).first()
     try:
-        prev_post.save()
-        return {"result": "success", "message": f'This post with postId = {postId} updated'}, 200
+        if post.get_userId() == data[os.getenv("USER_ID")]:
+            post.title = data.get(os.getenv("TITLE"))
+            post.body = data.get(os.getenv("BODY"))
+            post.save()
+            return {"result": "success", "message": f'This post with postId = {postId} for user {post.get_userId()} updated'}, 200
+        return {"result": "error", "message": "This user doesn't have access to this post"}, 403
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
@@ -78,12 +114,16 @@ def edit_post(postId):
 @app.route('/delete_post/<postId>', methods=['DELETE'])
 def delete_post(postId):
     '''
-    Fetches post with the postId in the path , return the deleted postId.
+    Fetch a post from the user's posts with postId in the path ,
+    return the deleted post if the post is intended for its real user.
     '''
-    get_post = Post.objects(postId=postId)
+    data = request.get_json()
+    post: Post = Post.objects(postId=data[os.getenv("POST_ID")]).first()
     try:
-        get_post.delete()
-        return {"result": "success", "message": f'This post with postId = {postId} deleted'}, 200
+        if post.get_userId() == data[os.getenv("USER_ID")]:
+            post.delete()
+            return {"result": "success", "message": f'This post with postId = {postId} for user {post.get_userId()} deleted'}, 200
+        return {"result": "error", "message": "This user doesn't have access to this post"}, 403
     except Exception as e:
         return {"result": "error", "message": f"{e}"}, 500
 
